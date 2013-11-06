@@ -11,6 +11,7 @@ def main():
   parser.add_argument('--outputdir', default='', help='Directory in which to place the generated inventory & decklist files. (default=~/Dropbox, ~/Ubuntu One, or the current working directory)')
   parser.add_argument("--singlecollectiononly", help="Don't recursively look for collections to convert", action="store_true")
   parser.add_argument("-f", dest='force', help="Don't warn prior to overwriting the export directory", action="store_true")
+  parser.add_argument("-d", dest='includedecks', help="Also scan the decks folder for cards; overridden by --singlecollectiononly or --inputdir", action="store_true")
   args = parser.parse_args()
   
   import os
@@ -72,8 +73,10 @@ def main():
     else:
       if os.path.exists(os.path.join(home, 'Dropbox', 'MagicAssistantWorkspace', 'magiccards', 'Collections', '')):
         collectionFolderStr = os.path.join(home, 'Dropbox', 'MagicAssistantWorkspace', 'magiccards', 'Collections', '')
+        deckFolderStr = os.path.join(home, 'Dropbox', 'MagicAssistantWorkspace', 'magiccards', 'Decks', '')
       elif os.path.exists(os.path.join(home, 'Ubuntu One', 'MagicAssistantWorkspace', 'magiccards', 'Collections', '')):
         collectionFolderStr = os.path.join(home, 'Ubuntu One', 'MagicAssistantWorkspace', 'magiccards', 'Collections', '')
+        deckFolderStr = os.path.join(home, 'Ubuntu One', 'MagicAssistantWorkspace', 'magiccards', 'Decks', '')
       else:
         print('Please specify a valid folder.')
         from sys import exit
@@ -85,6 +88,11 @@ def main():
     for root, dirnames, filenames in os.walk(collectionFolderStr):
       for filename in fnmatch.filter(filenames, '*.xml'):
         listoffiles.append(os.path.join(root, filename))
+    if args.includedecks:
+      for root, dirnames, filenames in os.walk(deckFolderStr):
+        for filename in fnmatch.filter(filenames, '*.xml'):
+          listoffiles.append(os.path.join(root, filename))
+        
     for collectionfile in listoffiles:
       cleanfilename = os.path.splitext(os.path.basename(collectionfile))[0]
       inventoryOutputDynamicStr = os.path.join(outputdirectoryprefix, cleanfilename) + ".csv"
@@ -145,11 +153,11 @@ def createdeckboxinv(stagedcsv,inventoryfile):
       #wtr.writerow((["Count"] + ["Tradelist Count"] + ["Name"] + ["Foil"] + ["Textless"] + ["Promo"] + ["Signed"] + ["Edition"] + ["Condition"] + ["Language"]))
       for r in rdr:
         # Check for foil, promo, or condition status
-        if len(r) > 7:
-          if len(r) > 8:
-            statusOffset = 1
-          else:
-            statusOffset = 0
+        if len(r) > 8:
+          statusOffset = 1
+        else:
+          statusOffset = 0
+        if len(r) >= 8:		
           if "foil" in r[7 + statusOffset]:
             foilstatus = "foil"
           else:
@@ -198,6 +206,8 @@ def createdeckboxinv(stagedcsv,inventoryfile):
         # If in a duel deck, none are available
         if ("Duel Deck" in r[2]):
           tradecount = 0
+        if ("Decks" in r[5]):
+          tradecount = 0  
         # Set up the name
         if ("(" in r[1]):
           cardname = r[1].replace("Æ","Ae").split(" (")[0]
@@ -209,10 +219,8 @@ def createdeckboxinv(stagedcsv,inventoryfile):
         # Set up the edition
         cardedition = r[2].replace("\"","").replace("Heroes vs. Monsters", "Heroes vs Monsters").replace("2012 Edition","2012").replace('Time Spiral \\Timeshifted\\','Time Spiral \"Timeshifted\"\"').replace('\"\"','\"')
         # Write the line to the file
-        if "loan to me" not in r[5] and r[4] != '0':
+        if (len(r) > 7 or (len(r) == 7 and r[6] == 'true')) and "loan to me" not in r[5] and r[4] != '0':
           wtr.writerow([r[4].replace("\"","").replace(" ","")] + [tradecount] + [cardname] + [foilstatus] + [r[3].replace("\"","").replace(" ","")] + [promostatus] + [r[3].replace("\"","").replace(" ","")] + [cardedition] + [condition] + ["English"])
-        else:
-          next(rdr)
 
 def createdecklist(stagedcsv,decklistfile):
   import csv
@@ -280,7 +288,6 @@ def xml2csv(collection):
   
   output.write(  '\n'.join(output_buffer) + '\n' )
   output_buffer = []
-
 
   return tempfileObj
 
