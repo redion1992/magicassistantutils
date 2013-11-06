@@ -237,7 +237,7 @@ def xml2csv(collection):
   import codecs, xml.etree.ElementTree as et
 
   import tempfile
-  tempfileObj = tempfile.NamedTemporaryFile()
+  tempfileObj = tempfile.NamedTemporaryFile(delete=False)
   
   # output file handle
   output = codecs.open(tempfileObj.name, "w", encoding='utf-8')
@@ -274,7 +274,7 @@ def xml2csv(collection):
       n+=1
           
       # flush buffer to disk
-      if len(output_buffer) > '1000':
+      if len(output_buffer) > 1000:
         output.write(  '\n'.join(output_buffer) + '\n' )
         output_buffer = []
   
