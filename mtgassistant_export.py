@@ -188,6 +188,8 @@ def createdeckboxinv(stagedcsv,inventoryfile):
             tradecount = 0
           elif ("Rare" in inventoryfile):
             tradecount = int(r[4].replace("\"","").replace(" ",""))
+          elif ("Extra C&U" in inventoryfile):
+            tradecount = int(r[4].replace("\"","").replace(" ",""))
           elif(int(r[4].replace("\"","").replace(" ","")) - 4) >= 0:
             tradecount = int(r[4].replace("\"","").replace(" ","")) - 4
           else:
@@ -200,7 +202,10 @@ def createdeckboxinv(stagedcsv,inventoryfile):
         if ("(" in r[1]):
           cardname = r[1].replace("Æ","Ae").split(" (")[0]
         else:
-          cardname = r[1].replace("Æ","Ae")
+          if 'Chaotic Æther' not in r[1]:
+-            cardname = r[1].replace("Æ","Ae")
+-          else:
+-            cardname = r[1]
         # Set up the edition
         cardedition = r[2].replace("\"","").replace("Heroes vs. Monsters", "Heroes vs Monsters").replace("2012 Edition","2012").replace('Time Spiral \\Timeshifted\\','Time Spiral \"Timeshifted\"\"').replace('\"\"','\"')
         # Write the line to the file
