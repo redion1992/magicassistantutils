@@ -210,14 +210,14 @@ def createdeckboxinv(stagedcsv,inventoryfile):
           tradecount = 0  
         # Set up the name
         if ("(" in r[1]):
-          cardname = r[1].replace("Æ","Ae").split(" (")[0]
+          cardname = r[1].replace("Ã†","Ae").split(" (")[0]
         else:
-          if 'Chaotic Æther' not in r[1]:
-            cardname = r[1].replace("Æ","Ae")
+          if 'Chaotic Ã†ther' not in r[1]:
+            cardname = r[1].replace("Ã†","Ae")
           else:
             cardname = r[1]
         # Set up the edition
-        cardedition = r[2].replace("\"","").replace("Heroes vs. Monsters", "Heroes vs Monsters").replace("2012 Edition","2012").replace('Time Spiral \\Timeshifted\\','Time Spiral \"Timeshifted\"\"').replace('\"\"','\"')
+        cardedition = r[2].replace("\"","").replace("Heroes vs. Monsters", "Heroes vs Monsters").replace("2012 Edition","2012").replace('Time Spiral \\Timeshifted\\','Time Spiral \"Timeshifted\"\"').replace('Magic: The Gathering-Commander', 'Commander').replace('\"\"','\"')
         # Write the line to the file
         if (len(r) > 7 or (len(r) == 7 and r[6] == 'true')) and "loan to me" not in r[5] and r[4] != '0':
           wtr.writerow([r[4].replace("\"","").replace(" ","")] + [tradecount] + [cardname] + [foilstatus] + [r[3].replace("\"","").replace(" ","")] + [promostatus] + [r[3].replace("\"","").replace(" ","")] + [cardedition] + [condition] + ["English"])
@@ -237,7 +237,6 @@ def createdecklist(stagedcsv,decklistfile):
           result.write(' ' + r[4] + ' ' + r[1] + os.linesep)
         else:
           next(rdr)
-
 
 def xml2csv(collection):
   # This function (c) Kailash Nadh, October 2011
