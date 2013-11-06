@@ -203,9 +203,9 @@ def createdeckboxinv(stagedcsv,inventoryfile):
           cardname = r[1].replace("Æ","Ae").split(" (")[0]
         else:
           if 'Chaotic Æther' not in r[1]:
--            cardname = r[1].replace("Æ","Ae")
--          else:
--            cardname = r[1]
+            cardname = r[1].replace("Æ","Ae")
+          else:
+            cardname = r[1]
         # Set up the edition
         cardedition = r[2].replace("\"","").replace("Heroes vs. Monsters", "Heroes vs Monsters").replace("2012 Edition","2012").replace('Time Spiral \\Timeshifted\\','Time Spiral \"Timeshifted\"\"').replace('\"\"','\"')
         # Write the line to the file
